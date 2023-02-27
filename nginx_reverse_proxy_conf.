@@ -1,0 +1,113 @@
+upstream redblue {
+server localhost:9001;
+server localhost:9002;
+}
+server {
+        server_name caty.hopto.org;
+        server_tokens off;
+
+
+        location / {
+                root /usr/share/nginx/html/hello_web;
+                index index.html index.htm;
+                try_files $uri $uri/ /index.html;
+        }
+
+        location /info.php {
+        proxy_pass http://localhost:1025;
+        }
+
+        location /music {
+        proxy_pass http://localhost:8000;
+        }
+
+        location /show {
+        proxy_pass http://localhost:9000;
+        }
+
+        location /blue {
+        proxy_pass http://redblue/blue;
+        }
+
+        location /red {
+        proxy_pass http://redblue/red;
+        }
+
+
+        location /images {
+        proxy_pass http://localhost:8004;
+        }
+
+        location /images2.png {
+        proxy_pass http://localhost:8003;
+        }
+
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/caty.hopto.org/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/caty.hopto.org/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+        listen 8000;
+        server_name caty.hopto.org;
+        root /var/www/html/web1;
+        index index.html index.htm;
+        try_files $uri $uri/ /index.html;
+}
+server {
+        listen 9000;
+        server_name caty.hopto.org;
+        root /var/www/html/web2;
+        index index.html index.htm;
+        try_files $uri $uri/ /index.html;
+}
+server {
+        listen 9001;
+        server_name caty.hopto.org;
+        root /var/www/html/web3;
+       index index.html index.htm;
+        try_files $uri $uri/ /index.html;
+}
+server {
+        listen 9002;
+        server_name caty.hopto.org;
+        root /var/www/html/web4;
+        index index.html index.htm;
+        try_files $uri $uri/ /index.html;
+}
+server {
+        listen 8004;
+        server_name caty.hopto.org;
+        root /var/www/html/web6;
+
+        location ~* .(jpg)$ {
+        root /var/www/html/web6;
+        image_filter rotate 90;
+        }
+
+}
+server {
+        listen 8003;
+        server_name caty.hopto.org;
+        root /var/www/html/web5;
+
+        location ~* .(png)$ {
+        root /var/www/html/web5;
+
+        }
+
+}
+
+server {
+    if ($host = caty.hopto.org) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+        listen 80;
+        server_name caty.hopto.org;
+        return 404; # managed by Certbot
+
